@@ -1,13 +1,17 @@
+import React, { useState, useMemo } from 'react';
+import { Target, Clock, BarChart2, Zap, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { MQM_TIERS, STRATEGIC_INTENTS, CONTEXT_MULTIPLIERS, UX_ACTIVITIES, ENGAGEMENT_MODES } from './constants/index.js';
 import EngagementSetup from './components/EngagementSetup';
 import RequirementsIntake from './components/RequirementsIntake';
 import SquadBuilder from './components/SquadBuilder';
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import DiscoveryWizard from './components/DiscoveryWizard';
+import IntelligencePanel from './components/IntelligencePanel';
+import './App.css';
 
 function App() {
+  // --- STATE ---
+  const [currentStep, setCurrentStep] = useState(1);
   const [engMode, setEngMode] = useState(null);
   const [industry, setIndustry] = useState(null);
   const [clientName, setClientName] = useState('');
@@ -15,133 +19,222 @@ function App() {
   const [reqText, setReqText] = useState('');
   const [parsedReqs, setParsedReqs] = useState([]);
   const [squadRoles, setSquadRoles] = useState({});
-  const [count, setCount] = useState(0)
 
+  // Discovery & IQ State
+  const [selectedIntentId, setSelectedIntentId] = useState('digital_experience');
+  const [pillarScores, setPillarScores] = useState({ strategy: 3, culture: 3, process: 3, outcomes: 3 });
+  const [selectedActivities, setSelectedActivities] = useState({});
+  const [infoMaturity, setInfoMaturity] = useState('high');
+  const [governance, setGovernance] = useState('direct');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [targetDate, setTargetDate] = useState(() => { 
+    const d = new Date(); 
+    d.setDate(d.getDate() + 90); 
+    return d.toISOString().split('T')[0]; 
+  });
+  const [budgetCap, setBudgetCap] = useState('');
+  const [dayRate, setDayRate] = useState('');
+  const [documentedScenarios, setDocumentedScenarios] = useState(0);
+  const [undocumentedScenarios, setUndocumentedScenarios] = useState(0);
+  const [selectedRisks, setSelectedRisks] = useState([]);
+
+  // --- CALCULATION LOGIC ---
+  const calculation = useMemo(() => {
+    const avgScore = Object.values(pillarScores).reduce((a, b) => a + b, 0) / 4;
+    const tier = MQM_TIERS.find(t => avgScore >= t.scoreRange[0] && avgScore <= t.scoreRange[1]) || MQM_TIERS[2];
+    const maturityM = tier.multiplier;
+    const intent = STRATEGIC_INTENTS.find(i => i.id === selectedIntentId);
+    const strategyM = intent?.legacyMultiplier ?? 1.0;
+    const infoM = CONTEXT_MULTIPLIERS.infoMaturity[infoMaturity]?.multiplier ?? 1.0;
+    const decisionM = CONTEXT_MULTIPLIERS.governance[governance]?.multiplier ?? 1.0;
+    const governanceM = infoM * decisionM;
+    let activityDays = 0;
+    Object.entries(selectedActivities).forEach(([id, data]) => {
+      const activity = UX_ACTIVITIES.find(a => a.id === id);
+      if (!activity) return;
+      const quantity = data.quantity || 1;
+      let effort = activity.baseEffort * quantity;
+      if (activity.buffer) effort *= (1 + activity.buffer);
+      activityDays += effort;
+      if (activity.synthesisRatio) activityDays += (effort * activity.synthesisRatio);
+    });
+    const scenarioDays = (documentedScenarios * 1.5) + (undocumentedScenarios * 3.0);
+    const baseDays = activityDays + scenarioDays;
+    const compoundedBase = baseDays * strategyM * maturityM * governanceM;
+    const finalDays = compoundedBase * 1.2;
+    const getBusinessDays = (start, end) => {
+      const d1 = new Date(start); const d2 = new Date(end);
+      if (isNaN(d1) || isNaN(d2) || d1 > d2) return 0;
+      let count = 0;
+      const cur = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+      const end2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate());
+      while (cur <= end2) { if (cur.getDay() !== 0 && cur.getDay() !== 6) count++; cur.setDate(cur.getDate() + 1); }
+      return count;
+    };
+    const availableBusinessDays = getBusinessDays(startDate, targetDate);
+    return { baseDays, activityDays, scenarioDays, strategyM, maturityM, infoM, decisionM, governanceM, compoundedBase, finalDays, availableBusinessDays, selectedIntent: intent, currentTier: tier };
+  }, [selectedIntentId, pillarScores, selectedActivities, infoMaturity, governance, startDate, targetDate, documentedScenarios, undocumentedScenarios]);
+
+  // --- RENDER ---
   return (
-    <>
-      <div className="space-y-5">
-        <EngagementSetup
-          engMode={engMode} setEngMode={setEngMode}
-          industry={industry} setIndustry={setIndustry}
-          clientName={clientName} setClientName={setClientName}
-          projectName={projectName} setProjectName={setProjectName}
-        />
-        <RequirementsIntake
-          reqText={reqText} setReqText={setReqText}
-          parsedReqs={parsedReqs} setParsedReqs={setParsedReqs}
-        />
-        <SquadBuilder
-          engMode={engMode}
-          squadRoles={squadRoles} setSquadRoles={setSquadRoles}
-        />
+    <div className="min-h-screen bg-slate-50 font-sans">
+
+      {/* HEADER */}
+      <div className="bg-white border-b border-slate-200 px-8 h-14 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+            <Target size={15} color="white" />
+          </div>
+          <div>
+            <div className="font-bold text-sm text-slate-800">PhoenixDX Scoping Portal</div>
+            <div className="text-xs text-slate-400">Engagement Value-Alignment Engine</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {clientName && <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700">{clientName}</span>}
+          {engMode && <span className="text-xs font-bold px-3 py-1 rounded-full bg-violet-50 border border-violet-200 text-violet-700">{ENGAGEMENT_MODES.find(m => m.id === engMode)?.label}</span>}
+        </div>
       </div>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {/* STEP BAR */}
+      <div className="bg-white border-b border-slate-200 fixed top-14 left-0 right-0 z-40">
+        <div className="max-w-6xl mx-auto px-8 py-3 flex items-center gap-0">
+          {['Engagement','Context','Requirements','Squad','Estimate'].map((label, i) => {
+            const stepNum = i + 1;
+            const isActive = currentStep === stepNum;
+            const isDone = currentStep > stepNum;
+            return (
+              <div key={label} className="flex items-center flex-1">
+                <button onClick={() => setCurrentStep(stepNum)} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : isDone ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
+                    {isDone ? <CheckCircle2 size={13} /> : stepNum}
+                  </div>
+                  <span className={`text-xs font-semibold whitespace-nowrap ${isActive ? 'text-indigo-600' : 'text-slate-400'}`}>{label}</span>
+                </button>
+                {i < 4 && <div className={`flex-1 h-0.5 mx-1 mb-4 ${isDone ? 'bg-green-200' : 'bg-slate-200'}`} />}
+              </div>
+            );
+          })}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* BODY */}
+      <div className="max-w-6xl mx-auto px-8 pt-36 pb-20 flex gap-6 items-start">
+
+        {/* LEFT COLUMN */}
+        <div className="flex-1 min-w-0 space-y-5">
+
+          {currentStep === 1 && (
+            <EngagementSetup
+              engMode={engMode} setEngMode={setEngMode}
+              industry={industry} setIndustry={setIndustry}
+              clientName={clientName} setClientName={setClientName}
+              projectName={projectName} setProjectName={setProjectName}
+              startDate={startDate} setStartDate={setStartDate}
+              targetDate={targetDate} setTargetDate={setTargetDate}
+              budgetCap={budgetCap} setBudgetCap={setBudgetCap}
+            />
+          )}
+
+          {currentStep === 2 && (
+            <DiscoveryWizard
+              selectedIntentId={selectedIntentId}
+              onSelectIntent={setSelectedIntentId}
+              pillarScores={pillarScores}
+              onScoreChange={setPillarScores}
+              selectedActivities={selectedActivities}
+              onToggleActivity={(id) => {
+                setSelectedActivities(curr => {
+                  const next = { ...curr };
+                  if (next[id]) delete next[id];
+                  else next[id] = { quantity: 1 };
+                  return next;
+                });
+              }}
+              onUpdateQuantity={(id, q) => {
+                setSelectedActivities(curr => ({
+                  ...curr,
+                  [id]: { ...curr[id], quantity: q }
+                }));
+              }}
+              infoMaturity={infoMaturity}
+              onInfoMaturityChange={setInfoMaturity}
+              governance={governance}
+              onGovernanceChange={setGovernance}
+              documentedScenarios={documentedScenarios}
+              onDocumentedScenariosChange={setDocumentedScenarios}
+              undocumentedScenarios={undocumentedScenarios}
+              onUndocumentedScenariosChange={setUndocumentedScenarios}
+              selectedRisks={selectedRisks}
+              onToggleRisk={(id) => {
+                setSelectedRisks(curr => 
+                  curr.includes(id) ? curr.filter(r => r !== id) : [...curr, id]
+                );
+              }}
+              finalCalculation={calculation}
+              baseDays={calculation.baseDays}
+              startDate={startDate}
+              onStartDateChange={setStartDate}
+              targetDate={targetDate}
+              onTargetDateChange={setTargetDate}
+              budgetCap={budgetCap}
+              onBudgetCapChange={setBudgetCap}
+              dayRate={dayRate}
+              onDayRateChange={setDayRate}
+            />
+          )}
+
+          {currentStep === 3 && (
+            <RequirementsIntake
+              reqText={reqText} setReqText={setReqText}
+              parsedReqs={parsedReqs} setParsedReqs={setParsedReqs}
+            />
+          )}
+
+          {currentStep === 4 && (
+            <SquadBuilder
+              engMode={engMode}
+              squadRoles={squadRoles}
+              setSquadRoles={setSquadRoles}
+            />
+          )}
+
+          {currentStep === 5 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
+              <div className="text-slate-400 text-sm">Estimate output coming in next phase.</div>
+            </div>
+          )}
+
+          {/* NAV BUTTONS */}
+          <div className="flex justify-between pt-4 border-t border-slate-200">
+            <button
+              onClick={() => setCurrentStep(s => Math.max(1, s - 1))}
+              disabled={currentStep === 1}
+              className="flex items-center gap-2 px-5 py-2.5 border-2 border-slate-200 rounded-xl text-slate-500 font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:border-slate-300 bg-white"
+            >
+              <ChevronLeft size={15} /> Back
+            </button>
+            <button
+              onClick={() => setCurrentStep(s => Math.min(5, s + 1))}
+              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-sm"
+            >
+              {currentStep === 4 ? 'Generate Estimate' : 'Next Step'} <ChevronRight size={15} />
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN — SIDEBAR */}
+        <div className="w-64 flex-shrink-0 sticky top-36 space-y-4">
+          <IntelligencePanel
+            budgetCap={budgetCap}
+            dayRate={dayRate}
+            calculation={calculation}
+          />
+        </div>
+
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
