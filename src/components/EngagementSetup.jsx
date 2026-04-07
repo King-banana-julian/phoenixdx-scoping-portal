@@ -1,5 +1,6 @@
-import React from 'react';
-import { ENGAGEMENT_MODES, INDUSTRIES } from '../constants/index.js';
+import React, { useState } from 'react';
+import { ENGAGEMENT_MODES, INDUSTRIES, STRATEGIC_INTENTS } from '../constants/index.js';
+import { Palette, Code2, Package, Heart, Landmark, Home, DollarSign, BookOpen, Truck, Cpu, Globe, Layers, Star, Zap, Settings, Users, Shield } from 'lucide-react';
 
 export default function EngagementSetup({
   engMode,
@@ -10,7 +11,24 @@ export default function EngagementSetup({
   setClientName,
   projectName,
   setProjectName,
+  startDate,
+  setStartDate,
+  targetDate,
+  setTargetDate,
+  budgetCap,
+  setBudgetCap,
+  selectedGoal,
+  setSelectedGoal,
 }) {
+  const [hasBudget, setHasBudget] = useState(true);
+
+  const modeIcons = { ux_only: Palette, design_to_dev: Code2, full_delivery: Package };
+  const industryIcons = {
+    healthcare: Heart, govt: Landmark, property: Home,
+    financial: DollarSign, research: BookOpen,
+    logistics: Truck, tech: Cpu, other: Globe
+  };
+
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Section 1 — Engagement Type */}
@@ -39,6 +57,10 @@ export default function EngagementSetup({
                     : {}
                 }
               >
+                {(() => {
+                  const Icon = modeIcons[mode.id];
+                  return Icon && <Icon size={20} color={isActive ? mode.color : '#94a3b8'} style={{ marginBottom: 8 }} />;
+                })()}
                 <div className="font-extrabold text-sm text-slate-800">{mode.label}</div>
                 <div className="text-xs text-slate-500 mt-1">{mode.sub}</div>
 
@@ -78,6 +100,10 @@ export default function EngagementSetup({
                     : 'border-2 border-slate-200 bg-white rounded-xl p-3 hover:border-slate-300'
                   }`}
               >
+                {(() => {
+                  const IIcon = industryIcons[ind.id];
+                  return IIcon && <IIcon size={16} color={isActive ? '#7c3aed' : '#94a3b8'} style={{ marginBottom: 6 }} />;
+                })()}
                 <div className={`text-sm font-bold ${isActive ? 'text-violet-900' : 'text-slate-700'}`}>
                   {ind.label}
                 </div>
@@ -123,6 +149,103 @@ export default function EngagementSetup({
               className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors"
             />
           </div>
+        </div>
+
+        {/* Dates row */}
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <div>
+            <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Start Date</label>
+            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors" />
+          </div>
+          <div>
+            <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Target Delivery Date</label>
+            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)}
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors" />
+          </div>
+        </div>
+
+        {/* Business days info pill - only when both dates set */}
+        {startDate && targetDate && (
+          <div className="mt-3 flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
+            <span className="text-xs font-bold text-indigo-600">
+              ℹ {(() => {
+                const d1 = new Date(startDate); const d2 = new Date(targetDate);
+                let count = 0; const cur = new Date(d1);
+                while (cur <= d2) { if (cur.getDay() !== 0 && cur.getDay() !== 6) count++; cur.setDate(cur.getDate() + 1); }
+                return count;
+              })()} business days available in this window
+            </span>
+          </div>
+        )}
+
+        {/* Budget toggle */}
+        <div className="mt-4">
+          <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-3">Budget</label>
+          <div className="flex gap-3 mb-3">
+            <button onClick={() => setHasBudget(true)}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${hasBudget ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-white text-slate-500'}`}>
+              I have a budget cap
+            </button>
+            <button onClick={() => setHasBudget(false)}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${!hasBudget ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-white text-slate-500'}`}>
+              Quote me — no cap set
+            </button>
+          </div>
+          {hasBudget && (
+            <input type="number" value={budgetCap} onChange={e => setBudgetCap(e.target.value)}
+              placeholder="Enter budget cap (AUD ex GST)"
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors" />
+          )}
+          {!hasBudget && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <p className="text-xs font-bold text-amber-700">No budget cap set — the estimate will show total projected cost based on your squad configuration.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Section 4 — Strategic Goal */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <p className="text-xs font-extrabold text-slate-500 uppercase tracking-widest mb-1">Strategic Goal</p>
+        <p className="text-sm text-slate-500 mb-4">Select the primary objective driving this engagement.</p>
+        <div className="grid grid-cols-3 gap-3">
+          {STRATEGIC_INTENTS.map(intent => {
+            const active = selectedGoal === intent.id;
+            const iconMap = {
+              legacy_modernization: Layers,
+              digital_experience: Star,
+              product_innovation: Zap,
+              internal_tooling: Settings,
+              self_service: Users,
+              accessibility_risk: Shield,
+            };
+            const Icon = iconMap[intent.id] || Star;
+            return (
+              <button
+                key={intent.id}
+                onClick={() => setSelectedGoal(active ? null : intent.id)}
+                className={`p-4 rounded-xl border-2 cursor-pointer text-left transition-all duration-150 ${active ? 'bg-indigo-50' : 'bg-white border-slate-200 hover:border-slate-300'}`}
+                style={active ? { borderColor: '#6366f1' } : {}}
+              >
+                <Icon size={18} color={active ? '#6366f1' : '#94a3b8'} style={{ marginBottom: 8 }} />
+                <div className={`text-sm font-bold ${active ? 'text-indigo-700' : 'text-slate-800'}`}>{intent.label}</div>
+                {intent.legacyMultiplier > 1 && (
+                  <div className="text-xs font-bold text-amber-500 mt-1">+{((intent.legacyMultiplier - 1) * 100).toFixed(0)}% effort</div>
+                )}
+                {active && intent.wmbt && (
+                  <div className="mt-2 space-y-1">
+                    {intent.wmbt.slice(0, 2).map((w, i) => (
+                      <div key={i} className="flex items-start gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0" />
+                        <p className="text-xs text-slate-500 leading-snug">{w}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

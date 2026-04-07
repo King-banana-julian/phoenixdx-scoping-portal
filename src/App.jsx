@@ -5,8 +5,10 @@ import { MQM_TIERS, STRATEGIC_INTENTS, CONTEXT_MULTIPLIERS, UX_ACTIVITIES, ENGAG
 import EngagementSetup from './components/EngagementSetup';
 import RequirementsIntake from './components/RequirementsIntake';
 import SquadBuilder from './components/SquadBuilder';
-import DiscoveryWizard from './components/DiscoveryWizard';
 import IntelligencePanel from './components/IntelligencePanel';
+import MaturityQuotientMatrix from './components/MaturityQuotientMatrix';
+import ContextToggles from './components/ContextToggles';
+import AssumptionsPanel from './components/AssumptionsPanel';
 import './App.css';
 
 function App() {
@@ -23,7 +25,7 @@ function App() {
   // Discovery & IQ State
   const [selectedIntentId, setSelectedIntentId] = useState('digital_experience');
   const [pillarScores, setPillarScores] = useState({ strategy: 3, culture: 3, process: 3, outcomes: 3 });
-  const [selectedActivities, setSelectedActivities] = useState({});
+  const [selectedActivities] = useState({});
   const [infoMaturity, setInfoMaturity] = useState('high');
   const [governance, setGovernance] = useState('direct');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -33,10 +35,9 @@ function App() {
     return d.toISOString().split('T')[0]; 
   });
   const [budgetCap, setBudgetCap] = useState('');
-  const [dayRate, setDayRate] = useState('');
-  const [documentedScenarios, setDocumentedScenarios] = useState(0);
-  const [undocumentedScenarios, setUndocumentedScenarios] = useState(0);
-  const [selectedRisks, setSelectedRisks] = useState([]);
+  const [dayRate] = useState('');
+  const [documentedScenarios] = useState(0);
+  const [undocumentedScenarios] = useState(0);
 
   // --- CALCULATION LOGIC ---
   const calculation = useMemo(() => {
@@ -133,55 +134,24 @@ function App() {
               startDate={startDate} setStartDate={setStartDate}
               targetDate={targetDate} setTargetDate={setTargetDate}
               budgetCap={budgetCap} setBudgetCap={setBudgetCap}
+              selectedGoal={selectedIntentId} setSelectedGoal={setSelectedIntentId}
             />
           )}
 
           {currentStep === 2 && (
-            <DiscoveryWizard
-              selectedIntentId={selectedIntentId}
-              onSelectIntent={setSelectedIntentId}
-              pillarScores={pillarScores}
-              onScoreChange={setPillarScores}
-              selectedActivities={selectedActivities}
-              onToggleActivity={(id) => {
-                setSelectedActivities(curr => {
-                  const next = { ...curr };
-                  if (next[id]) delete next[id];
-                  else next[id] = { quantity: 1 };
-                  return next;
-                });
-              }}
-              onUpdateQuantity={(id, q) => {
-                setSelectedActivities(curr => ({
-                  ...curr,
-                  [id]: { ...curr[id], quantity: q }
-                }));
-              }}
-              infoMaturity={infoMaturity}
-              onInfoMaturityChange={setInfoMaturity}
-              governance={governance}
-              onGovernanceChange={setGovernance}
-              documentedScenarios={documentedScenarios}
-              onDocumentedScenariosChange={setDocumentedScenarios}
-              undocumentedScenarios={undocumentedScenarios}
-              onUndocumentedScenariosChange={setUndocumentedScenarios}
-              selectedRisks={selectedRisks}
-              onToggleRisk={(id) => {
-                setSelectedRisks(curr => 
-                  curr.includes(id) ? curr.filter(r => r !== id) : [...curr, id]
-                );
-              }}
-              finalCalculation={calculation}
-              baseDays={calculation.baseDays}
-              startDate={startDate}
-              onStartDateChange={setStartDate}
-              targetDate={targetDate}
-              onTargetDateChange={setTargetDate}
-              budgetCap={budgetCap}
-              onBudgetCapChange={setBudgetCap}
-              dayRate={dayRate}
-              onDayRateChange={setDayRate}
-            />
+            <div className="space-y-5">
+              <MaturityQuotientMatrix
+                scores={pillarScores}
+                onScoreChange={(pillarId, value) => setPillarScores(prev => ({ ...prev, [pillarId]: value }))}
+              />
+              <ContextToggles
+                infoMaturity={infoMaturity}
+                onInfoMaturityChange={setInfoMaturity}
+                governance={governance}
+                onGovernanceChange={setGovernance}
+              />
+              <AssumptionsPanel />
+            </div>
           )}
 
           {currentStep === 3 && (
@@ -226,8 +196,6 @@ function App() {
         {/* RIGHT COLUMN — SIDEBAR */}
         <div className="w-64 flex-shrink-0 sticky top-36 space-y-4">
           <IntelligencePanel
-            budgetCap={budgetCap}
-            dayRate={dayRate}
             calculation={calculation}
           />
         </div>

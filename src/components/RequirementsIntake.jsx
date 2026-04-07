@@ -86,9 +86,10 @@ export default function RequirementsIntake({
           )}
         </div>
         
-        <p className="text-slate-400 text-xs mt-3">
-          AI-assisted parsing coming in Phase 2 — currently structures plain-text input locally.
-        </p>
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <p className="text-xs font-bold text-amber-700 mb-1">⚡ Phase 2 — AI-Assisted Parsing Coming Soon</p>
+          <p className="text-xs text-amber-600">Currently this tool structures plain-text input locally using pattern matching. In Phase 2, pasting a client brief will automatically extract requirements, flag integration risks, map to PhoenixDX delivery activities, and suggest assumption coverage — powered by the Anthropic API.</p>
+        </div>
       </div>
 
       {/* Section 2 */}

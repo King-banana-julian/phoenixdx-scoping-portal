@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { CONTEXT_MULTIPLIERS } from '../constants';
 import { BookOpen, Users } from 'lucide-react';

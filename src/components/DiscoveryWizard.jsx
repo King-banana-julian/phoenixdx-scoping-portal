@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useMemo } from 'react';
 import {
   UX_ACTIVITIES, STRATEGIC_INTENTS, TECH_REQUIREMENTS, CONTEXT_MULTIPLIERS, RISK_FACTORS

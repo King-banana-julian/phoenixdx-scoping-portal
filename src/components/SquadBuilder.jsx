@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Plus, X } from 'lucide-react';
 import { SQUAD_ROLE_TEMPLATES, ENGAGEMENT_MODES } from '../constants/index.js';
 
 export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
+  const [roles, setRoles] = useState(
+    engMode && SQUAD_ROLE_TEMPLATES[engMode] ? SQUAD_ROLE_TEMPLATES[engMode].map(r => ({ ...r })) : []
+  );
+
+  useEffect(() => {
+    if (engMode && SQUAD_ROLE_TEMPLATES[engMode]) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRoles(SQUAD_ROLE_TEMPLATES[engMode].map(r => ({ ...r })));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSquadRoles({});
+    }
+  }, [engMode, setSquadRoles]);
+
+  const [newRoleLabel, setNewRoleLabel] = useState('');
+
   if (!engMode) {
     return (
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm w-full">
@@ -13,7 +29,13 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
   }
 
   const activeMode = ENGAGEMENT_MODES.find(m => m.id === engMode);
-  const roles = SQUAD_ROLE_TEMPLATES[engMode] || [];
+
+  const addRole = () => {
+    if (!newRoleLabel.trim()) return;
+    const newId = `custom_${Date.now()}`;
+    setRoles(prev => [...prev, { id: newId, label: newRoleLabel.trim(), days: 0, rate: '' }]);
+    setNewRoleLabel('');
+  };
 
   const handleRoleChange = (roleId, field, value) => {
     setSquadRoles(prev => ({
@@ -60,6 +82,7 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
               <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">Days Effort</th>
               <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">Day Rate (AUD)</th>
               <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200 text-right">Total (AUD ex GST)</th>
+              <th className="py-3 px-4 text-xs font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-200">Remove</th>
             </tr>
           </thead>
           <tbody>
@@ -103,6 +126,12 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
                       <span className="text-slate-300 font-bold">—</span>
                     )}
                   </td>
+                  <td className="py-2 px-3">
+                    <button onClick={() => setRoles(prev => prev.filter(r => r.id !== role.id))}
+                      className="text-slate-300 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer">
+                      <X size={13} />
+                    </button>
+                  </td>
                 </tr>
               );
             })}
@@ -117,9 +146,24 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
               <td className="py-4 px-4 text-sm font-extrabold text-emerald-600 text-right">
                 {totals.cost > 0 ? `$${totals.cost.toLocaleString("en-AU", { maximumFractionDigits: 0 })}` : "—"}
               </td>
+              <td className="py-4 px-4"></td>
             </tr>
           </tfoot>
         </table>
+
+        <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
+          <input
+            value={newRoleLabel}
+            onChange={e => setNewRoleLabel(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && addRole()}
+            placeholder="Add a custom role (e.g. Business Analyst, QA Lead)..."
+            className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder-slate-400"
+          />
+          <button onClick={addRole}
+            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-colors">
+            <Plus size={13} /> Add Role
+          </button>
+        </div>
       </div>
     </div>
   );

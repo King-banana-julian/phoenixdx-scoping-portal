@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useMemo } from 'react';
 import { Calculator, Info, Zap, ShieldAlert, TrendingUp } from 'lucide-react';
 
 /**
