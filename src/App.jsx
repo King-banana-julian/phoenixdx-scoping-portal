@@ -9,6 +9,7 @@ import IntelligencePanel from './components/IntelligencePanel';
 import MaturityQuotientMatrix from './components/MaturityQuotientMatrix';
 import ContextToggles from './components/ContextToggles';
 import AssumptionsPanel from './components/AssumptionsPanel';
+import EstimateSummary from './components/EstimateSummary';
 import './App.css';
 
 function App() {
@@ -78,131 +79,173 @@ function App() {
 
   // --- RENDER ---
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-white font-sans antialiased relative">
 
-      {/* HEADER */}
-      <div className="bg-white border-b border-slate-200 px-8 h-14 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
+      {/* STICKY NAV BAR (top: 0) */}
+      <div className="bg-white border-b border-swiss-border-default px-8 h-16 flex items-center justify-between sticky top-0 z-[60] w-full">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-            <Target size={15} color="white" />
+          <div className="w-8 h-8 rounded-sm bg-swiss-interactive-primary flex items-center justify-center">
+            <Target size={14} color="white" />
           </div>
-          <div>
-            <div className="font-bold text-sm text-slate-800">PhoenixDX Scoping Portal</div>
-            <div className="text-xs text-slate-400">Engagement Value-Alignment Engine</div>
+          <div className="leading-tight">
+            <div className="font-semibold text-sm text-swiss-text-primary">PhoenixDX Scoping Portal</div>
+            <div className="text-xs text-swiss-text-tertiary">Engagement Value-Alignment Engine</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {clientName && <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700">{clientName}</span>}
-          {engMode && <span className="text-xs font-bold px-3 py-1 rounded-full bg-violet-50 border border-violet-200 text-violet-700">{ENGAGEMENT_MODES.find(m => m.id === engMode)?.label}</span>}
+          {clientName && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-swiss-bg-info border border-swiss-border-accent text-swiss-text-info">
+              {clientName}
+            </span>
+          )}
+          {engMode && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-swiss-bg-success border border-swiss-border-success text-swiss-text-success">
+              {ENGAGEMENT_MODES.find(m => m.id === engMode)?.label}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* STEP BAR */}
-      <div className="bg-white border-b border-slate-200 fixed top-14 left-0 right-0 z-40">
-        <div className="max-w-6xl mx-auto px-8 py-3 flex items-center gap-0">
+      {/* STICKY PROGRESS BAR TRACK (top: 64px) */}
+      <div className="sticky top-[64px] z-[50] w-full h-1 bg-swiss-bg-tertiary">
+        <div 
+          className="h-full bg-swiss-interactive-primary transition-all duration-300 ease-in-out"
+          style={{ width: `${(currentStep / 5) * 100}%` }}
+        />
+      </div>
+
+      {/* STICKY STEP NAVIGATION BAR (top: 68px) */}
+      <div className="bg-white border-b border-swiss-border-default sticky top-[68px] z-40 w-full overflow-hidden">
+        <div className="max-w-6xl mx-auto px-8 py-2 flex items-center gap-0">
           {['Engagement','Context','Requirements','Squad','Estimate'].map((label, i) => {
             const stepNum = i + 1;
             const isActive = currentStep === stepNum;
             const isDone = currentStep > stepNum;
             return (
               <div key={label} className="flex items-center flex-1">
-                <button onClick={() => setCurrentStep(stepNum)} className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : isDone ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                    {isDone ? <CheckCircle2 size={13} /> : stepNum}
+                <button 
+                  onClick={() => setCurrentStep(stepNum)} 
+                  className="flex flex-col items-center gap-1 cursor-pointer bg-transparent border-none p-0 group"
+                >
+                  <div className={`w-6 h-6 rounded-sm flex items-center justify-center text-xs font-semibold transition-all ${
+                    isActive 
+                      ? 'bg-swiss-interactive-primary text-white' 
+                      : isDone 
+                        ? 'bg-swiss-bg-success text-swiss-text-success' 
+                        : 'bg-swiss-bg-tertiary text-swiss-text-tertiary group-hover:bg-swiss-interactive-primary-inactive'
+                  }`}>
+                    {isDone ? <CheckCircle2 size={12} /> : stepNum}
                   </div>
-                  <span className={`text-xs font-semibold whitespace-nowrap ${isActive ? 'text-indigo-600' : 'text-slate-400'}`}>{label}</span>
+                  <span className={`text-xs font-semibold whitespace-nowrap transition-all ${
+                    isActive 
+                      ? 'text-swiss-interactive-primary' 
+                      : 'text-swiss-text-tertiary group-hover:text-swiss-interactive-primary-hover'
+                  }`}>
+                    {label}
+                  </span>
                 </button>
-                {i < 4 && <div className={`flex-1 h-0.5 mx-1 mb-4 ${isDone ? 'bg-green-200' : 'bg-slate-200'}`} />}
+                {i < 4 && (
+                  <div className={`flex-1 h-px mx-2 mb-4 ${isDone ? 'bg-swiss-border-success' : 'bg-swiss-border-subtle'}`} />
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* BODY */}
-      <div className="max-w-6xl mx-auto px-8 pt-36 pb-20 flex gap-6 items-start">
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 bg-swiss-bg-secondary w-full">
+        <div className="max-w-6xl mx-auto px-8 py-10 flex gap-12 items-start">
 
-        {/* LEFT COLUMN */}
-        <div className="flex-1 min-w-0 space-y-5">
+          {/* LEFT COLUMN */}
+          <div className="flex-1 min-w-0 space-y-6">
 
-          {currentStep === 1 && (
-            <EngagementSetup
-              engMode={engMode} setEngMode={setEngMode}
-              industry={industry} setIndustry={setIndustry}
-              clientName={clientName} setClientName={setClientName}
-              projectName={projectName} setProjectName={setProjectName}
-              startDate={startDate} setStartDate={setStartDate}
-              targetDate={targetDate} setTargetDate={setTargetDate}
-              budgetCap={budgetCap} setBudgetCap={setBudgetCap}
-              selectedGoal={selectedIntentId} setSelectedGoal={setSelectedIntentId}
-            />
-          )}
-
-          {currentStep === 2 && (
-            <div className="space-y-5">
-              <MaturityQuotientMatrix
-                scores={pillarScores}
-                onScoreChange={(pillarId, value) => setPillarScores(prev => ({ ...prev, [pillarId]: value }))}
+            {currentStep === 1 && (
+              <EngagementSetup
+                engMode={engMode} setEngMode={setEngMode}
+                industry={industry} setIndustry={setIndustry}
+                clientName={clientName} setClientName={setClientName}
+                projectName={projectName} setProjectName={setProjectName}
+                startDate={startDate} setStartDate={setStartDate}
+                targetDate={targetDate} setTargetDate={setTargetDate}
+                budgetCap={budgetCap} setBudgetCap={setBudgetCap}
+                selectedGoal={selectedIntentId} setSelectedGoal={setSelectedIntentId}
               />
-              <ContextToggles
-                infoMaturity={infoMaturity}
-                onInfoMaturityChange={setInfoMaturity}
-                governance={governance}
-                onGovernanceChange={setGovernance}
+            )}
+
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <MaturityQuotientMatrix
+                  scores={pillarScores}
+                  onScoreChange={(pillarId, value) => setPillarScores(prev => ({ ...prev, [pillarId]: value }))}
+                />
+                <ContextToggles
+                  infoMaturity={infoMaturity}
+                  onInfoMaturityChange={setInfoMaturity}
+                  governance={governance}
+                  onGovernanceChange={setGovernance}
+                />
+                <AssumptionsPanel />
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <RequirementsIntake
+                reqText={reqText} setReqText={setReqText}
+                parsedReqs={parsedReqs} setParsedReqs={setParsedReqs}
               />
-              <AssumptionsPanel />
-            </div>
-          )}
+            )}
 
-          {currentStep === 3 && (
-            <RequirementsIntake
-              reqText={reqText} setReqText={setReqText}
-              parsedReqs={parsedReqs} setParsedReqs={setParsedReqs}
-            />
-          )}
+            {currentStep === 4 && (
+              <SquadBuilder
+                engMode={engMode}
+                squadRoles={squadRoles}
+                setSquadRoles={setSquadRoles}
+              />
+            )}
 
-          {currentStep === 4 && (
-            <SquadBuilder
-              engMode={engMode}
-              squadRoles={squadRoles}
-              setSquadRoles={setSquadRoles}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
-              <div className="text-slate-400 text-sm">Estimate output coming in next phase.</div>
-            </div>
-          )}
-
-          {/* NAV BUTTONS */}
-          <div className="flex justify-between pt-4 border-t border-slate-200">
-            <button
-              onClick={() => setCurrentStep(s => Math.max(1, s - 1))}
-              disabled={currentStep === 1}
-              className="flex items-center gap-2 px-5 py-2.5 border-2 border-slate-200 rounded-xl text-slate-500 font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:border-slate-300 bg-white"
-            >
-              <ChevronLeft size={15} /> Back
-            </button>
-            <button
-              onClick={() => setCurrentStep(s => Math.min(5, s + 1))}
-              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm shadow-sm"
-            >
-              {currentStep === 4 ? 'Generate Estimate' : 'Next Step'} <ChevronRight size={15} />
-            </button>
+            {currentStep === 5 && (
+              <EstimateSummary
+                calculation={calculation}
+                clientName={clientName}
+                projectName={projectName}
+                engMode={engMode}
+                selectedGoal={selectedIntentId}
+              />
+            )}
           </div>
-        </div>
 
-        {/* RIGHT COLUMN — SIDEBAR */}
-        <div className="w-64 flex-shrink-0 sticky top-36 space-y-4">
-          <IntelligencePanel
-            calculation={calculation}
-          />
-        </div>
+          {/* RIGHT COLUMN — SIDEBAR */}
+          <div className="w-64 flex-shrink-0 sticky top-[160px] space-y-4">
+            <IntelligencePanel
+              calculation={calculation}
+            />
+          </div>
 
+        </div>
+      </div>
+
+      {/* STICKY FOOTER (bottom: 0) */}
+      <div className="bg-white border-t border-swiss-border-default sticky bottom-0 z-50 w-full">
+        <div className="max-w-6xl mx-auto px-8 h-16 flex items-center justify-between">
+          <button
+            onClick={() => setCurrentStep(s => Math.max(1, s - 1))}
+            disabled={currentStep === 1}
+            className="flex items-center gap-2 px-4 h-10 border border-swiss-border-default rounded-md text-swiss-text-secondary font-semibold text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-swiss-bg-secondary transition-all active:scale-95 transition-all duration-150 ease-in-out"
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
+          <button
+            onClick={() => setCurrentStep(s => Math.min(5, s + 1))}
+            className="flex items-center gap-2 px-6 h-10 bg-swiss-interactive-primary hover:bg-swiss-interactive-primary-hover active:bg-[#042C53] active:scale-95 text-white rounded-md font-semibold text-sm transition-all duration-150 ease-in-out"
+          >
+            {currentStep === 4 ? 'Generate Estimate' : 'Next Step'} <ChevronRight size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
 export default App;
+

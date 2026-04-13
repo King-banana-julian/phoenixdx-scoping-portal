@@ -1,13 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: theme('colors.swiss-border-default');
+  }
+
+  body {
+    background-color: theme('colors.swiss-bg-secondary');
+    color: theme('colors.swiss-text-primary');
+    @apply font-sans antialiased m-0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: theme('colors.swiss-text-primary');
+    @apply font-semibold tracking-tight;
+    line-height: 1.2;
+  }
 }
 
-body {
-  margin: 0;
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
-  background: #f4f6fa;
+@layer components {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .swiss-card {
+    background-color: theme('colors.swiss-bg-primary');
+    border: 1px solid theme('colors.swiss-border-default');
+    @apply rounded-md p-5 shadow-none;
+  }
+
+  .swiss-input {
+    background-color: theme('colors.swiss-bg-primary');
+    border: 1px solid theme('colors.swiss-border-default');
+    color: theme('colors.swiss-text-primary');
+    @apply rounded-md px-3 h-10 text-sm font-normal outline-none transition-all;
+  }
+  
+  .swiss-input:focus {
+    border-color: theme('colors.swiss-border-accent');
+    box-shadow: 0 0 0 1px theme('colors.swiss-border-accent');
+  }
+
+  .swiss-input::placeholder {
+    color: theme('colors.swiss-text-tertiary');
+  }
+
+  .swiss-label {
+    color: theme('colors.swiss-text-secondary');
+    @apply text-xs font-semibold uppercase tracking-widest mb-2;
+  }
 }

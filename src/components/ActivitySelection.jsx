@@ -1,90 +1,91 @@
 import React from 'react';
 import { UX_ACTIVITIES } from '../constants';
-import { ClipboardList, Plus, Minus, Info } from 'lucide-react';
+import { ClipboardList, Plus, Minus, Info, Check } from 'lucide-react';
 
 const ActivitySelection = ({ selectedActivities, onToggleActivity, onUpdateQuantity }) => {
   const stages = ['Discover', 'Define', 'Develop', 'Deliver'];
 
   return (
-    <section className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-      <div className="flex items-center gap-2 mb-6">
-        <ClipboardList className="text-violet-600" size={24} />
-        <h3 className="text-xl font-bold text-gray-900">UX Activity Selection</h3>
+    <section className="swiss-card">
+      <div className="flex items-center gap-2 mb-8">
+        <ClipboardList className="text-swiss-interactive-primary" size={16} />
+        <h2 className="swiss-label mb-0">Activity Manifest</h2>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-12">
         {stages.map(stage => (
           <div key={stage} className="space-y-4">
-            <h4 className="flex items-center gap-3 text-xs font-black uppercase tracking-widest border-b border-gray-200 pb-2">
-              <span className="bg-violet-50 text-violet-700 px-3 py-1 rounded-full">{stage} Phase</span>
+            <h4 className="flex items-center gap-3 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-subtle pb-2">
+              {stage} Phase
             </h4>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-2">
               {UX_ACTIVITIES.filter(a => a.stage === stage).map(activity => {
                 const isSelected = !!selectedActivities[activity.id];
-                const quantity = selectedActivities[activity.id]?.quantity || 0;
+                const quantity = selectedActivities[activity.id]?.quantity || 1;
 
                 return (
                   <div 
                     key={activity.id}
-                    className={`flex flex-col p-4 rounded-xl border transition-all group ${
+                    className={`flex flex-col p-4 rounded-md border transition-all duration-150 ease-in-out group active:scale-[0.99] cursor-pointer ${
                       isSelected 
-                        ? 'bg-violet-50 border-violet-300 shadow-sm' 
-                        : 'bg-white border-gray-200 hover:border-violet-300'
+                        ? 'bg-swiss-bg-info border-swiss-interactive-primary' 
+                        : 'bg-white border-swiss-border-default hover:border-swiss-interactive-primary'
                     }`}
+                    onClick={() => onToggleActivity(activity.id)}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-start gap-3">
-                        <button
-                          onClick={() => onToggleActivity(activity.id)}
-                          className={`mt-0.5 w-5 h-5 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${
-                            isSelected ? 'bg-violet-600 border-violet-600 text-white' : 'border-gray-300 group-hover:border-violet-400'
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start gap-4">
+                        <div 
+                          className={`mt-0.5 w-5 h-5 rounded-sm border flex items-center justify-center transition-all ${
+                            isSelected 
+                              ? 'bg-swiss-interactive-primary border-swiss-interactive-primary text-white' 
+                              : 'bg-white border-swiss-border-default group-hover:border-swiss-interactive-primary'
                           }`}
                         >
-                          {isSelected && <div className="w-2 h-2 bg-white rounded-sm" />}
-                        </button>
+                          {isSelected && <Check size={12} strokeWidth={3} />}
+                        </div>
                         <div className="flex flex-col">
-                          {/* Outcome is bold black text */}
-                          <span className={`font-bold text-sm ${isSelected ? 'text-gray-900' : 'text-gray-900'}`}>
-                            {activity.outcome}
+                          <span className="font-semibold text-sm text-swiss-text-primary leading-tight">
+                            {activity.outcome || "—"}
                           </span>
-                          {/* Activity is smaller gray text below it */}
-                          <span className={`text-[11px] mt-0.5 ${isSelected ? 'text-violet-700 font-medium' : 'text-gray-500'}`}>
+                          <span className={`text-[11px] mt-1 font-medium ${isSelected ? 'text-swiss-interactive-primary' : 'text-swiss-text-tertiary'}`}>
                             Activity: {activity.label}
                           </span>
                         </div>
                       </div>
                       
                       {isSelected && (
-                        <div className="flex items-center gap-3 bg-white rounded-lg p-1 border border-violet-200 shadow-sm">
+                        <div 
+                          className="flex items-center gap-2 bg-white rounded-md p-1 border border-swiss-interactive-primary/20 shadow-none"
+                          onClick={(e) => e.stopPropagation()} // Prevent card toggle
+                        >
                           <button 
                             onClick={() => onUpdateQuantity(activity.id, Math.max(1, quantity - 1))}
-                            className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-900"
+                            className="p-1.5 hover:bg-swiss-bg-secondary rounded-sm text-swiss-text-tertiary hover:text-swiss-text-primary transition-all active:scale-90"
                           >
-                            <Minus size={14} />
+                            <Minus size={12} />
                           </button>
-                          <span className="text-xs font-mono font-bold text-violet-700 min-w-[20px] text-center">
-                            {quantity || 1}
+                          <span className="text-xs font-semibold text-swiss-interactive-primary min-w-[16px] text-center tabular-nums">
+                            {quantity}
                           </span>
                           <button 
-                            onClick={() => onUpdateQuantity(activity.id, (quantity || 1) + 1)}
-                            className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-900"
+                            onClick={() => onUpdateQuantity(activity.id, quantity + 1)}
+                            className="p-1.5 hover:bg-swiss-bg-secondary rounded-sm text-swiss-text-tertiary hover:text-swiss-text-primary transition-all active:scale-90"
                           >
-                            <Plus size={14} />
+                            <Plus size={12} />
                           </button>
                         </div>
                       )}
                     </div>
 
-                    <div className="pl-8">
-                      <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500 uppercase tracking-tight mt-1">
-                        <span>Base: {activity.baseEffort} {activity.unit}</span>
-                        {activity.synthesisRatio && (
-                          <span className="text-emerald-600 italic flex items-center gap-1">
-                            <Info size={10} />
-                            Synthesis Automator Active (1:{activity.synthesisRatio})
-                          </span>
-                        )}
-                      </div>
+                    <div className="pl-9 mt-3 flex items-center gap-4 text-[10px] font-semibold text-swiss-text-tertiary uppercase tracking-wider">
+                      <span>Base: {activity.baseEffort} {activity.unit}</span>
+                      {activity.synthesisRatio && (
+                        <span className="text-swiss-text-success italic flex items-center gap-1">
+                          <Info size={10} />
+                          Synthesis Automator Active (1:{activity.synthesisRatio})
+                        </span>
+                      )}
                     </div>
                   </div>
                 );

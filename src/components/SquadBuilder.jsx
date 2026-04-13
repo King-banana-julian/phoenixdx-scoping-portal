@@ -20,9 +20,9 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
 
   if (!engMode) {
     return (
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm w-full">
-        <div className="text-slate-400 text-sm py-8 text-center">
-          Select an engagement type in the Engagement Setup section to configure your squad.
+      <div className="swiss-card w-full">
+        <div className="text-swiss-text-tertiary text-sm py-12 text-center font-normal italic">
+          Select an engagement model to configure your squad.
         </div>
       </div>
     );
@@ -56,36 +56,35 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
   }, { days: 0, cost: 0 });
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm w-full">
-      <div className="flex items-center gap-3 mb-2">
-        <h2 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
-          Squad Builder
-        </h2>
-        {activeMode && (
-          <span 
-            className="text-[10px] font-bold px-2 py-0.5 rounded text-white" 
-            style={{ backgroundColor: activeMode.color }}
-          >
-            {activeMode.label}
-          </span>
-        )}
+    <div className="swiss-card w-full p-0 overflow-hidden">
+      <div className="p-8 border-b border-swiss-border-subtle bg-white">
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="swiss-label mb-0">Squad Configuration</h2>
+          {activeMode && (
+            <span 
+              className="text-[10px] font-bold px-2 py-0.5 rounded-sm bg-swiss-bg-info border border-swiss-interactive-primary/20 text-swiss-interactive-primary uppercase tracking-widest"
+            >
+              {activeMode.label}
+            </span >
+          )}
+        </div>
+        <p className="text-sm text-swiss-text-secondary font-normal italic leading-relaxed">
+          Determine effort and rates (AUD ex GST). Commercial data is volatile and not persisted.
+        </p>
       </div>
-      <p className="text-sm text-slate-500 mb-6">
-        Enter effort in days and day rate (AUD ex GST) per role. Rates are confidential and not stored or shared.
-      </p>
 
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto w-full bg-white">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr>
-              <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">Role</th>
-              <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">Days Effort</th>
-              <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200">Day Rate (AUD)</th>
-              <th className="py-3 px-4 text-xs font-extrabold text-slate-500 uppercase tracking-wider border-b border-slate-200 text-right">Total (AUD ex GST)</th>
-              <th className="py-3 px-4 text-xs font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-200">Remove</th>
+            <tr className="bg-swiss-bg-secondary">
+              <th className="py-3 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-default">Role</th>
+              <th className="py-3 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-default">Days</th>
+              <th className="py-3 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-default">Rate (AUD)</th>
+              <th className="py-3 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-default text-right">Total</th>
+              <th className="py-3 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-[0.2em] border-b border-swiss-border-default w-12"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-swiss-border-subtle">
             {roles.map((role, idx) => {
               const days = squadRoles?.[role.id]?.days || "";
               const rate = squadRoles?.[role.id]?.rate || "";
@@ -94,77 +93,79 @@ export default function SquadBuilder({ engMode, squadRoles, setSquadRoles }) {
               const hasTotal = numDays > 0 && numRate > 0;
 
               return (
-                <tr key={role.id} className={`border-b border-slate-100 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}`}>
-                  <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                <tr key={role.id} className="hover:bg-swiss-bg-secondary transition-colors group">
+                  <td className="py-4 px-8 text-sm font-semibold text-swiss-text-primary">
                     {role.label}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-4 px-8">
                     <input
                       type="number"
                       min="0"
                       value={days}
                       onChange={(e) => handleRoleChange(role.id, 'days', e.target.value)}
-                      className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 w-24"
+                      className="swiss-input w-24 px-3 tabular-nums"
+                      placeholder="0"
                     />
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-4 px-8">
                     <input
                       type="number"
                       min="0"
-                      placeholder="Enter rate"
+                      placeholder="0"
                       value={rate}
                       onChange={(e) => handleRoleChange(role.id, 'rate', e.target.value)}
-                      className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-500 w-32"
+                      className="swiss-input w-28 px-3 tabular-nums"
                     />
                   </td>
-                  <td className="py-3 px-4 text-right">
+                  <td className="py-4 px-8 text-right tabular-nums">
                     {hasTotal ? (
-                      <span className="text-sm font-bold text-slate-800">
+                      <span className="text-sm font-semibold text-swiss-text-primary">
                         ${(numDays * numRate).toLocaleString("en-AU", { maximumFractionDigits: 0 })}
                       </span>
                     ) : (
-                      <span className="text-slate-300 font-bold">—</span>
+                      <span className="text-swiss-text-tertiary font-normal">—</span>
                     )}
                   </td>
-                  <td className="py-2 px-3">
+                  <td className="py-4 px-8 text-center">
                     <button onClick={() => setRoles(prev => prev.filter(r => r.id !== role.id))}
-                      className="text-slate-300 hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer">
-                      <X size={13} />
+                      className="text-swiss-text-tertiary hover:text-swiss-text-danger transition-all duration-150 p-1 rounded-sm hover:bg-swiss-bg-danger/10 opacity-0 group-hover:opacity-100 active:scale-90">
+                      <X size={14} />
                     </button>
                   </td>
                 </tr>
               );
             })}
           </tbody>
-          <tfoot>
+          <tfoot className="bg-swiss-bg-secondary/30">
             <tr>
-              <td className="py-4 px-4 text-sm font-extrabold text-slate-800 text-right">Total</td>
-              <td className="py-4 px-4 text-sm font-extrabold text-indigo-600">
-                {totals.days > 0 ? totals.days : "—"}
+              <td className="py-6 px-8 text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-widest text-right">Aggregate</td>
+              <td className="py-6 px-8 text-sm font-bold text-swiss-interactive-primary tabular-nums">
+                {totals.days > 0 ? totals.days.toFixed(1) : "—"}
               </td>
-              <td className="py-4 px-4"></td>
-              <td className="py-4 px-4 text-sm font-extrabold text-emerald-600 text-right">
+              <td className="py-6 px-8"></td>
+              <td className="py-6 px-8 text-sm font-bold text-swiss-text-success text-right tabular-nums">
                 {totals.cost > 0 ? `$${totals.cost.toLocaleString("en-AU", { maximumFractionDigits: 0 })}` : "—"}
               </td>
-              <td className="py-4 px-4"></td>
+              <td className="py-6 px-8"></td>
             </tr>
           </tfoot>
         </table>
 
-        <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
+        <div className="p-8 bg-swiss-bg-secondary flex gap-3 border-t border-swiss-border-default">
           <input
             value={newRoleLabel}
             onChange={e => setNewRoleLabel(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addRole()}
-            placeholder="Add a custom role (e.g. Business Analyst, QA Lead)..."
-            className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 bg-slate-50 outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder-slate-400"
+            placeholder="Add custom role label..."
+            className="swiss-input flex-1 font-normal"
           />
           <button onClick={addRole}
-            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-bold transition-colors">
-            <Plus size={13} /> Add Role
+            className="flex items-center gap-2 px-6 h-10 bg-swiss-interactive-primary hover:bg-swiss-interactive-primary-hover active:bg-[#042C53] active:scale-95 text-white rounded-md text-sm font-semibold transition-all duration-150 ease-in-out">
+            <Plus size={14} /> Add Role
           </button>
         </div>
       </div>
     </div>
   );
 }
+
