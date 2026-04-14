@@ -18,6 +18,7 @@ function App() {
   const [industry, setIndustry] = useState(null);
   const [clientName, setClientName] = useState('');
   const [projectName, setProjectName] = useState('');
+  const [screenCounts, setScreenCounts] = useState({});
   
   // Intake Step 0 State
   const [intakeState, setIntakeState] = useState(() => {
@@ -29,6 +30,8 @@ function App() {
   const [showSummary, setShowSummary] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
+
+  const intakeCompleted = !!(intakeState.q1 && intakeState.q2 && showRecommendations);
 
   // Draft Auto-save
   useEffect(() => {
@@ -265,6 +268,12 @@ function App() {
                 toggleActivity={toggleActivity}
                 updateActivity={updateActivity}
                 recs={getRecommendations(intakeState)}
+                intakeState={intakeState}
+                intakeCompleted={intakeCompleted}
+                setCurrentStep={setCurrentStep}
+                applyRecommendations={applyRecommendations}
+                screenCounts={screenCounts}
+                setScreenCounts={setScreenCounts}
               />
             )}
 
