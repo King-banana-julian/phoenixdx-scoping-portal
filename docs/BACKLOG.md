@@ -6,7 +6,15 @@ Items are listed in priority order within each section. Backlog items marked �
 
 ## In Progress
 
-None currently.
+[ ] Intelligence Panel — reposition as Scope Integrity and Review screen
+
+---
+
+## Completed
+
+[x] Discovery Intake Layer — 15 Apr 2026
+[x] Activity Manifest — intake data wiring — 15 Apr 2026
+[x] Scope Summary — budget alignment check — 15 Apr 2026
 
 ---
 
