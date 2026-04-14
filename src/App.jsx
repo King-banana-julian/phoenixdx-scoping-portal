@@ -81,6 +81,7 @@ function App() {
     return d.toISOString().split('T')[0]; 
   });
   const [budgetCap, setBudgetCap] = useState('');
+  const [dayRate, setDayRate] = useState(1500);
 
   // Engine Hook
   const { 
@@ -117,6 +118,40 @@ function App() {
     // 4. Final (including UNKNOWN TAX/Buffer - using 1.2x as per legacy for now)
     const finalDays = compoundedBase * 1.2;
 
+    const parsedDayRate = parseFloat(dayRate) || 0;
+    const parsedBudgetCap = parseFloat(budgetCap) || 0;
+    const estimatedCost = finalDays * parsedDayRate;
+    
+    let budgetCalc = {
+      dayRate: parsedDayRate,
+      estimatedCost,
+      budgetCap: parsedBudgetCap,
+      budgetGap: 0,
+      budgetFit: false,
+      budgetOverflow: false,
+      requiredDayRate: 0,
+      daysToRemove: 0,
+      hasBudgetCap: parsedBudgetCap > 0
+    };
+
+    if (parsedBudgetCap > 0) {
+      budgetCalc.budgetGap = Math.abs(parsedBudgetCap - estimatedCost);
+      budgetCalc.budgetFit = estimatedCost <= parsedBudgetCap;
+      budgetCalc.budgetOverflow = estimatedCost > parsedBudgetCap;
+      budgetCalc.requiredDayRate = Math.floor(parsedBudgetCap / finalDays);
+      budgetCalc.daysToRemove = parsedDayRate ? Math.ceil((estimatedCost - parsedBudgetCap) / parsedDayRate) : 0;
+    }
+
+    // Now, update activityDetails to include proportional specific final cost
+    const adjustedActivityDetails = engineCalc.activityDetails.map(activity => {
+      const activityFinalDays = activity.calculatedEffort * strategyM * maturityM * governanceM * 1.2;
+      return {
+        ...activity,
+        finalDays: activityFinalDays,
+        cost: activityFinalDays * parsedDayRate
+      };
+    });
+
     const getBusinessDays = (start, end) => {
       const d1 = new Date(start); const d2 = new Date(end);
       if (isNaN(d1) || isNaN(d2) || d1 > d2) return 0;
@@ -130,6 +165,7 @@ function App() {
 
     return { 
       ...engineCalc,
+      activityDetails: adjustedActivityDetails,
       baseDays, 
       compoundedBase, 
       finalDays, 
@@ -140,9 +176,10 @@ function App() {
       governanceM, 
       availableBusinessDays, 
       currentTier: tier,
-      selectedIntentId
+      selectedIntentId,
+      ...budgetCalc
     };
-  }, [selectedIntentId, pillarScores, infoMaturity, governance, startDate, targetDate, engineCalc]);
+  }, [selectedIntentId, pillarScores, infoMaturity, governance, startDate, targetDate, engineCalc, budgetCap, dayRate]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-white font-sans font-semibold">Loading Portal Engine...</div>;
 
@@ -244,6 +281,7 @@ function App() {
                   startDate={startDate} setStartDate={setStartDate}
                   targetDate={targetDate} setTargetDate={setTargetDate}
                   budgetCap={budgetCap} setBudgetCap={setBudgetCap}
+                  dayRate={dayRate} setDayRate={setDayRate}
                   selectedGoal={selectedIntentId} setSelectedGoal={setSelectedIntentId}
                 />
                 <div className="border-t border-swiss-border-default pt-12 space-y-8">
@@ -284,6 +322,7 @@ function App() {
                 engMode={engMode}
                 calculation={calculation}
                 engagementModeLabel={ENGAGEMENT_MODES.find(m => m.id === engMode)?.label}
+                setCurrentStep={setCurrentStep}
               />
             )}
           </div>

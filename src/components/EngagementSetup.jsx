@@ -19,6 +19,8 @@ export default function EngagementSetup({
   setBudgetCap,
   selectedGoal,
   setSelectedGoal,
+  dayRate,
+  setDayRate,
 }) {
   const [hasBudget, setHasBudget] = useState(true);
 
@@ -191,15 +193,27 @@ export default function EngagementSetup({
           </div>
           
           {hasBudget ? (
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-swiss-text-tertiary uppercase">Budget Cap (AUD ex GST)</label>
-              <input 
-                type="number" 
-                value={budgetCap} 
-                onChange={e => setBudgetCap(e.target.value)}
-                placeholder="Enter value..."
-                className="swiss-input w-full tabular-nums" 
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-swiss-text-tertiary uppercase">Budget Cap (AUD ex GST)</label>
+                <input 
+                  type="number" 
+                  value={budgetCap} 
+                  onChange={e => setBudgetCap(e.target.value)}
+                  placeholder="Enter value..."
+                  className="swiss-input w-full tabular-nums" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-swiss-text-tertiary uppercase">Day Rate (AUD ex GST)</label>
+                <input 
+                  type="number" 
+                  value={dayRate} 
+                  onChange={e => setDayRate(e.target.value)}
+                  placeholder="e.g. 1500"
+                  className="swiss-input w-full tabular-nums" 
+                />
+              </div>
             </div>
           ) : (
             <div className="bg-swiss-bg-warning border border-swiss-border-warning/30 rounded-md px-4 py-3">
