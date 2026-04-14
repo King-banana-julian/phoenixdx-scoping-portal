@@ -109,6 +109,16 @@ const ActivityManifest = ({ activities, selectedActivities, toggleActivity, upda
                       </div>
                     </div>
                   )}
+                  {recs?.reasons?.[activity.id] && (
+                    <div className="flex-1 space-y-1 bg-swiss-interactive-primary/5 p-2 rounded-sm border border-swiss-interactive-primary/10">
+                      <div className="text-[10px] font-bold text-swiss-interactive-primary uppercase tracking-wider flex items-center gap-1">
+                        <Zap size={10} /> Recommendation Signal
+                      </div>
+                      <div className="text-xs text-swiss-text-secondary leading-normal italic">
+                        "{recs.reasons[activity.id]}"
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

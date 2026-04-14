@@ -1,7 +1,8 @@
-import { Target, Clock, BarChart2, Zap, AlertTriangle } from 'lucide-react';
+import { Target, Clock, BarChart2, Zap, AlertTriangle, MessageSquare } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { calculateIntakeSignals } from '../utils/intakeLogic';
 
-const IntelligencePanel = ({ calculation }) => {
+const IntelligencePanel = ({ calculation, intakeState }) => {
   const { finalDays, availableBusinessDays, strategyM, maturityM, governanceM, infoM } = calculation;
   const daysRemaining = availableBusinessDays > 0 ? availableBusinessDays - finalDays : null;
   const timeCritical = daysRemaining !== null && daysRemaining < 0;
@@ -115,6 +116,40 @@ const IntelligencePanel = ({ calculation }) => {
           Avg. +65% overrun at Tier ≤ 2
         </p>
       </div>
+
+      {/* INTAKE SIGNAL */}
+      {intakeState && (
+        <div className="swiss-card">
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare size={12} className="text-swiss-interactive-primary" />
+            <h2 className="swiss-label mb-0">Intake Signal</h2>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-swiss-text-tertiary uppercase tracking-wider">Confidence Score</span>
+              <span className={`text-xs font-bold ${calculateIntakeSignals(intakeState).score >= 80 ? 'text-swiss-text-success' : 'text-swiss-text-warning'}`}>
+                {calculateIntakeSignals(intakeState).score}/100
+              </span>
+            </div>
+            
+            <div className="space-y-1.5 pt-2 border-t border-swiss-border-subtle">
+              <span className="text-[9px] font-bold text-swiss-text-tertiary uppercase tracking-widest">Deltas & Risls</span>
+              {calculateIntakeSignals(intakeState).deltas.slice(0, 3).map((delta, i) => (
+                <div key={i} className="flex gap-2 text-[10px] text-swiss-text-tertiary leading-tight">
+                  <span>▲</span>
+                  <span>{delta}</span>
+                </div>
+              ))}
+              {calculateIntakeSignals(intakeState).deltas.length > 3 && (
+                <div className="text-[9px] text-swiss-text-tertiary font-bold italic">
+                  + {calculateIntakeSignals(intakeState).deltas.length - 3} more gaps
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
