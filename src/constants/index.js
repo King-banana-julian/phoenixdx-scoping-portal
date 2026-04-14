@@ -5,9 +5,6 @@ export const MQM_TIERS = [
     multiplier: 1.8,
     scoreRange: [0, 1.5],
     friction: "High Resistance. UX is ignored or seen as an obstacle. Significant education and overhead required.",
-    color: "bg-red-500",
-    textColor: "text-red-500",
-    borderColor: "border-red-500/50"
   },
   {
     tier: 2,
@@ -15,9 +12,6 @@ export const MQM_TIERS = [
     multiplier: 1.5,
     scoreRange: [1.6, 2.5],
     friction: "Tactical & Siloed. UX is a 'last-minute' addition. High friction in handoffs and decision-making.",
-    color: "bg-orange-500",
-    textColor: "text-orange-500",
-    borderColor: "border-orange-500/50"
   },
   {
     tier: 3,
@@ -25,9 +19,6 @@ export const MQM_TIERS = [
     multiplier: 1.3,
     scoreRange: [2.6, 3.5],
     friction: "Functional but Inconsistent. Team understands UX but lacks standardized processes.",
-    color: "bg-yellow-500",
-    textColor: "text-yellow-500",
-    borderColor: "border-yellow-500/50"
   },
   {
     tier: 4,
@@ -35,9 +26,6 @@ export const MQM_TIERS = [
     multiplier: 1.1,
     scoreRange: [3.6, 4.5],
     friction: "Linked to Strategy. Documented processes exist. Resistance is low, but alignment can improve.",
-    color: "bg-lime-500",
-    textColor: "text-lime-500",
-    borderColor: "border-lime-500/50"
   },
   {
     tier: 5,
@@ -57,11 +45,11 @@ export const PILLARS = [
     label: 'Strategy', 
     description: 'Is UX tied to business KPIs and ROI?',
     levels: [
-      { score: 1, label: 'Absent', color: 'bg-red-500', text: 'text-red-500', border: 'border-red-500/50', hover: 'hover:border-red-500', desc: 'UX is entirely excluded from business strategy planning.' },
-      { score: 2, label: 'Aware', color: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500/50', hover: 'hover:border-orange-500', desc: 'Leadership acknowledges UX but treats it as a tactical afterthought.' },
-      { score: 3, label: 'Partial', color: 'bg-yellow-500', text: 'text-yellow-500', border: 'border-yellow-500/50', hover: 'hover:border-yellow-500', desc: 'UX metrics are tracked but do not consistently drive product decisions.' },
-      { score: 4, label: 'Integrated', color: 'bg-lime-500', text: 'text-lime-500', border: 'border-lime-500/50', hover: 'hover:border-lime-500', desc: 'UX research and KPIs actively shape the product roadmap.' },
-      { score: 5, label: 'Core Driver', color: 'bg-green-500', text: 'text-green-500', border: 'border-green-500/50', hover: 'hover:border-green-500', desc: 'UX is a core driver of business strategy and value creation.' }
+      { score: 1, label: 'Absent', desc: 'UX is entirely excluded from business strategy planning.' },
+      { score: 2, label: 'Aware', desc: 'Leadership acknowledges UX but treats it as a tactical afterthought.' },
+      { score: 3, label: 'Partial', desc: 'UX metrics are tracked but do not consistently drive product decisions.' },
+      { score: 4, label: 'Integrated', desc: 'UX research and KPIs actively shape the product roadmap.' },
+      { score: 5, label: 'Core Driver', desc: 'UX is a core driver of business strategy and value creation.' }
     ]
   },
   { 
@@ -69,11 +57,11 @@ export const PILLARS = [
     label: 'Culture', 
     description: 'Do stakeholders respect design process and timelines?',
     levels: [
-      { score: 1, label: 'No Buy-in', color: 'bg-red-500', text: 'text-red-500', border: 'border-red-500/50', hover: 'hover:border-red-500', desc: 'Design is viewed as mere decoration. Timelines ignore discovery.' },
-      { score: 2, label: 'Limited', color: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500/50', hover: 'hover:border-orange-500', desc: 'Some stakeholders value UX, but it is easily overridden by engineering or sales.' },
-      { score: 3, label: 'Mixed', color: 'bg-yellow-500', text: 'text-yellow-500', border: 'border-yellow-500/50', hover: 'hover:border-yellow-500', desc: 'Support varies by team. Pockets of good UX culture exist but aren\'t systemic.' },
-      { score: 4, label: 'Strong', color: 'bg-lime-500', text: 'text-lime-500', border: 'border-lime-500/50', hover: 'hover:border-lime-500', desc: 'Cross-functional teams respect UX processes and allocate time for research.' },
-      { score: 5, label: 'Embedded', color: 'bg-green-500', text: 'text-green-500', border: 'border-green-500/50', hover: 'hover:border-green-500', desc: 'User-centricity is embedded in the company culture from the top down.' }
+      { score: 1, label: 'No Buy-in', desc: 'Design is viewed as mere decoration. Timelines ignore discovery.' },
+      { score: 2, label: 'Limited', desc: 'Some stakeholders value UX, but it is easily overridden by engineering or sales.' },
+      { score: 3, label: 'Mixed', desc: 'Support varies by team. Pockets of good UX culture exist but aren\'t systemic.' },
+      { score: 4, label: 'Strong', desc: 'Cross-functional teams respect UX processes and allocate time for research.' },
+      { score: 5, label: 'Embedded', desc: 'User-centricity is embedded in the company culture from the top down.' }
     ]
   },
   { 
@@ -81,11 +69,11 @@ export const PILLARS = [
     label: 'Process', 
     description: 'Is there a documented design system or research methodology?',
     levels: [
-      { score: 1, label: 'None', color: 'bg-red-500', text: 'text-red-500', border: 'border-red-500/50', hover: 'hover:border-red-500', desc: 'No standardized design methodologies. Every project starts from scratch.' },
-      { score: 2, label: 'Ad Hoc', color: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500/50', hover: 'hover:border-orange-500', desc: 'Processes exist but are inconsistently applied or poorly documented.' },
-      { score: 3, label: 'Defined', color: 'bg-yellow-500', text: 'text-yellow-500', border: 'border-yellow-500/50', hover: 'hover:border-yellow-500', desc: 'Design systems and research methods are documented but struggle with adoption.' },
-      { score: 4, label: 'Standard', color: 'bg-lime-500', text: 'text-lime-500', border: 'border-lime-500/50', hover: 'hover:border-lime-500', desc: 'Standardized, repeatable UX processes are widely adopted across teams.' },
-      { score: 5, label: 'Optimized', color: 'bg-green-500', text: 'text-green-500', border: 'border-green-500/50', hover: 'hover:border-green-500', desc: 'Processes are continuously optimized, automated, and strictly governed.' }
+      { score: 1, label: 'None', desc: 'No standardized design methodologies. Every project starts from scratch.' },
+      { score: 2, label: 'Ad Hoc', desc: 'Processes exist but are inconsistently applied or poorly documented.' },
+      { score: 3, label: 'Defined', desc: 'Design systems and research methods are documented but struggle with adoption.' },
+      { score: 4, label: 'Standard', desc: 'Standardized, repeatable UX processes are widely adopted across teams.' },
+      { score: 5, label: 'Optimized', desc: 'Processes are continuously optimized, automated, and strictly governed.' }
     ]
   },
   { 
@@ -93,11 +81,11 @@ export const PILLARS = [
     label: 'Outcomes', 
     description: 'Are product decisions driven by user data vs assumptions?',
     levels: [
-      { score: 1, label: 'Assumptions', color: 'bg-red-500', text: 'text-red-500', border: 'border-red-500/50', hover: 'hover:border-red-500', desc: 'Product decisions are entirely intuition-based or executive fiat.' },
-      { score: 2, label: 'Minimal', color: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500/50', hover: 'hover:border-orange-500', desc: 'Data is occasionally consulted, but assumptions often win out.' },
-      { score: 3, label: 'Inconsistent', color: 'bg-yellow-500', text: 'text-yellow-500', border: 'border-yellow-500/50', hover: 'hover:border-yellow-500', desc: 'Analytics exist but are used reactively rather than proactively.' },
-      { score: 4, label: 'Data-Driven', color: 'bg-lime-500', text: 'text-lime-500', border: 'border-lime-500/50', hover: 'hover:border-lime-500', desc: 'Quantitative and qualitative user data consistently drive feature prioritization.' },
-      { score: 5, label: 'Insight-Led', color: 'bg-green-500', text: 'text-green-500', border: 'border-green-500/50', hover: 'hover:border-green-500', desc: 'Deep user insights predict market needs and validate all major decisions.' }
+      { score: 1, label: 'Assumptions', desc: 'Product decisions are entirely intuition-based or executive fiat.' },
+      { score: 2, label: 'Minimal', desc: 'Data is occasionally consulted, but assumptions often win out.' },
+      { score: 3, label: 'Inconsistent', desc: 'Analytics exist but are used reactively rather than proactively.' },
+      { score: 4, label: 'Data-Driven', desc: 'Quantitative and qualitative user data consistently drive feature prioritization.' },
+      { score: 5, label: 'Insight-Led', desc: 'Deep user insights predict market needs and validate all major decisions.' }
     ]
   }
 ];
@@ -203,9 +191,6 @@ export const STRATEGIC_INTENTS = [
       'Stakeholders accept that a "lift and shift" ignores strategic value.',
       'Technical debt is recognized as a measurable blocker to user flow.'
     ],
-    color: 'text-purple-400',
-    borderColor: 'border-purple-500/50',
-    bgColor: 'bg-purple-500/10'
   },
   {
     id: 'digital_experience',
@@ -297,12 +282,12 @@ export const STRATEGIC_INTENTS = [
 // From STRATEGIC_REQUIREMENTS_MATRIX.md — Section 1: Global Multipliers
 export const CONTEXT_MULTIPLIERS = {
   infoMaturity: {
-    high: { id: 'high', label: 'High', description: 'Docs, personas & specs exist', multiplier: 1.0, tag: '1.0×', color: 'text-emerald-400' },
-    low:  { id: 'low',  label: 'Low',  description: 'No docs, verbal only — +25% Discovery Buffer', multiplier: 1.25, tag: '+25%', color: 'text-orange-400' }
+    high: { id: 'high', label: 'High', description: 'Docs, personas & specs exist', multiplier: 1.0, tag: '1.0×' },
+    low:  { id: 'low',  label: 'Low',  description: 'No docs, verbal only — +25% Discovery Buffer', multiplier: 1.25, tag: '+25%' }
   },
   governance: {
-    direct:    { id: 'direct',    label: 'Direct',    description: 'Single PM/PO — fast decisions', multiplier: 1.0, tag: '1.0×', color: 'text-emerald-400' },
-    committee: { id: 'committee', label: 'Committee', description: 'Group consensus — +20% Synthesis Buffer', multiplier: 1.2, tag: '+20%', color: 'text-orange-400' }
+    direct:    { id: 'direct',    label: 'Direct',    description: 'Single PM/PO — fast decisions', multiplier: 1.0, tag: '1.0×' },
+    committee: { id: 'committee', label: 'Committee', description: 'Group consensus — +20% Synthesis Buffer', multiplier: 1.2, tag: '+20%' }
   }
 };
 
